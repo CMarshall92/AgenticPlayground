@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const { closePool } = require("../../db/postgres");
-const { buildDefaultCycleName, runDailyPipeline } = require("./daily_pipeline_runner");
+const { buildDefaultCycleName, runDailyPipeline } = require("./daily_runner");
 
 
 function parseScheduleValue(name, min, max, fallback) {

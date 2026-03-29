@@ -9,4 +9,4 @@ COPY src ./src
 COPY README.md ./README.md
 COPY .env.preview ./.env.preview
 
-CMD ["npm", "run", "pipeline:schedule"]
+CMD ["npm", "run", "scheduler"]

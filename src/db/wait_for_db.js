@@ -28,11 +28,18 @@ async function waitForDatabase() {
 }
 
 
-waitForDatabase()
-  .catch((error) => {
-    console.error(JSON.stringify({ ok: false, error: error.message }, null, 2));
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await closePool();
-  });
+if (require.main === module) {
+  waitForDatabase()
+    .catch((error) => {
+      console.error(JSON.stringify({ ok: false, error: error.message }, null, 2));
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await closePool();
+    });
+}
+
+
+module.exports = {
+  waitForDatabase,
+};

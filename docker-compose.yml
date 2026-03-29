@@ -24,7 +24,7 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://agnetic:agnetic@postgres:5432/agneticanalysis
-    command: sh -c "npm run db:wait && npm run db:init && npm run pipeline:schedule"
+    command: sh -c "node src/db/wait_for_db.js && node src/db/init_db.js && npm run scheduler"
 
 volumes:
   postgres_data:

@@ -5,15 +5,16 @@ This repo now includes a Postgres-backed daily pipeline runner, an automatic LLM
 The daily runner does these steps:
 
 1. Initializes the cycle folder under `src/output/<cycle>`.
-2. Captures Trading 212 portfolio context and per-ticker broker context.
-3. Captures market-data snapshots for configured equities and FRED series.
-4. Optionally builds a rebalance preview when target weights are configured.
-5. Automatically generates the five agent reports when an OpenAI-compatible LLM is configured.
-6. Persists collected artifacts, report files, authored agent outputs, and a final pipeline summary into Postgres.
+2. In `micro_cap_agents` mode, the rules engine builds a tradable candidate universe from market news, insider activity, and Trading 212 instruments.
+3. Captures Trading 212 portfolio context and per-ticker broker context.
+4. Captures market-data snapshots for the selected equities and configured FRED series.
+5. Optionally builds a rebalance preview when target weights are configured.
+6. Automatically generates the five agent reports when an OpenAI-compatible LLM is configured.
+7. Persists collected artifacts, report files, authored agent outputs, and a final pipeline summary into Postgres.
 
 Current limitation:
 
-- Automatic report generation is limited to the configured `PIPELINE_SYMBOLS` universe and the captured data bundle for that run.
+- Broad microcap discovery is still heuristics-based. It uses broker-tradable instruments plus market news and insider activity to build a candidate set before pulling deeper equity snapshots.
 - If no LLM is configured, the data collection still runs but the report files remain manual/template-based.
 
 ## Required Environment Variables
@@ -52,13 +53,19 @@ LLM report generation:
 
 Daily runner configuration:
 
-- `PIPELINE_SYMBOLS` comma-separated ticker list such as `NVDA,SMCI,VRT`
+- `PIPELINE_SYMBOL_MODE` one of `rules_engine`, `configured`, or `auto`; `rules_engine` is the default for `micro_cap_agents`
+- `PIPELINE_SYMBOLS` optional comma-separated seed/watchlist ticker list used by rules-engine mode, or the full universe in configured mode
 - `PIPELINE_FRED_SERIES` comma-separated FRED series ids such as `DGS10,INDPRO`
 - `PIPELINE_COMPANY_NAMES` optional JSON object keyed by ticker
 - `PIPELINE_CIK_MAP` optional JSON object keyed by ticker
-- `PIPELINE_TARGET_WEIGHTS` optional JSON object whose weights sum to `100`
+- `PIPELINE_TARGET_WEIGHTS` optional JSON object whose weights sum to `100`; primarily useful when you already know the portfolio targets
 - `PIPELINE_CYCLE_NAME` optional explicit cycle name override
 - `PIPELINE_NEWS_LIMIT` optional per-provider news item limit
+- `RULES_ENGINE_CANDIDATE_LIMIT` optional number of names the rules engine carries into deeper analysis
+- `RULES_ENGINE_RAW_LIMIT` optional number of raw candidates the rules engine enriches before final selection
+- `RULES_ENGINE_MAX_MARKET_CAP` optional maximum market cap used by the rules engine when filtering smaller-cap candidates
+- `RULES_ENGINE_INSIDER_ROWS` optional number of insider-trade rows the rules engine ingests per run
+- `RULES_ENGINE_NEWS_QUERIES` optional comma-separated query list used by the rules engine for broad news scanning
 
 Scheduler configuration:
 
@@ -76,31 +83,31 @@ Database wait helper:
 Initialize or refresh the database schema:
 
 ```bash
-npm run db:init
+node src/db/init_db.js
 ```
 
 Run one daily collection cycle immediately:
 
 ```bash
-npm run pipeline:run-daily
+npm run pipeline
 ```
 
 Start the long-running UTC scheduler:
 
 ```bash
-npm run pipeline:schedule
+npm run scheduler
 ```
 
 Wait for the configured database before startup:
 
 ```bash
-npm run db:wait
+node src/db/wait_for_db.js
 ```
 
 Syntax-check the current codebase:
 
 ```bash
-npm run check
+node --check src/scheduler/core/daily_runner.js
 ```
 
 ## Stored Postgres Data
@@ -121,14 +128,14 @@ The report-generation layer uses an OpenAI-compatible Chat Completions API.
 
 When `LLM_ENABLED=true` and the model credentials are configured, the runner will:
 
-1. Read the numbered prompt files in `src/agents/`.
-2. Build a bounded context bundle from broker data, market data, and prior agent outputs.
+1. Read the numbered prompt files in `src/scheduler/agents/micro_cap_agents/`.
+2. Build a bounded context bundle from the rules engine artifact, broker data, market data, and prior agent outputs.
 3. Generate authored markdown reports for:
-   - Macro Strategist
-   - Sector Analyst
-   - Risk Manager
-   - Portfolio Manager
-   - YOLO Microcap Hunter
+   - Microcap Trend Scanner
+   - Microcap Universe Scout
+   - Investment Standards Reviewer
+   - Microcap Portfolio Manager
+   - Microcap Catalyst Hunter
 4. Write those markdown files into the cycle folder before persisting them to Postgres.
 
 ## Docker
@@ -152,9 +159,9 @@ To start everything:
 docker compose up --build
 ```
 
-The container image now defaults to `npm run pipeline:schedule`.
+The container image now defaults to `npm run scheduler`.
 
-If you want to execute a single cycle instead of the long-running scheduler, override the container command with `npm run pipeline:run-daily`.
+If you want to execute a single cycle instead of the long-running scheduler, override the container command with `npm run pipeline`.
 
 If you prefer Neon or another hosted Postgres instance, replace the `DATABASE_URL` in `docker-compose.yml` or remove the local `postgres` service and point both containers at the external database.
 

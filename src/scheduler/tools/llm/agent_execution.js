@@ -3,7 +3,7 @@ require("dotenv").config();
 const fs = require("fs/promises");
 const path = require("path");
 
-const { REPORT_FILES } = require("../../core/pipeline_cycle");
+const { REPORT_FILES } = require("../../core/src/pipeline_cycle");
 const { OpenAICompatibleLlmClient, resolveLlmConfig } = require("./openai_compatible_client");
 
 const REPORT_ORDER = ["macro", "sector", "risk", "portfolio", "yolo"];
@@ -100,11 +100,40 @@ function simplifyEquitySnapshot(marketDataSnapshot) {
 }
 
 
-function buildSharedContext({ config, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview }) {
+function simplifyRulesEngineOutput(rulesEngineOutput) {
+  if (!rulesEngineOutput) {
+    return null;
+  }
+
+  return {
+    seedSymbols: rulesEngineOutput.seedSymbols || [],
+    queryTerms: rulesEngineOutput.queryTerms || [],
+    rawCandidateCount: rulesEngineOutput.rawCandidateCount || 0,
+    selectedSymbols: rulesEngineOutput.selectedSymbols || [],
+    sourceBreakdown: rulesEngineOutput.sourceBreakdown || {},
+    candidates: (rulesEngineOutput.candidates || []).map((candidate) => ({
+      symbol: candidate.symbol,
+      companyName: candidate.companyName,
+      marketCap: candidate.marketCap,
+      selectionBucket: candidate.selectionBucket,
+      score: candidate.score,
+      sourceTypes: candidate.sourceTypes,
+      catalystSignals: candidate.catalystSignals,
+      mentionCount: candidate.mentionCount,
+      newsSignal: candidate.newsSignal,
+      insiderSignal: candidate.insiderSignal,
+    })),
+  };
+}
+
+
+function buildSharedContext({ config, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview, rulesEngineOutput }) {
   return {
     asOfDate: new Date().toISOString().slice(0, 10),
     cycleName: config.cycleName,
+    symbolMode: config.symbolMode || "configured",
     symbolUniverse: config.symbols,
+    seedSymbols: config.seedSymbols || [],
     configuredTargetWeights: config.targetWeights || null,
     companyNames: config.companyNames,
     cikMap: config.cikMap,
@@ -113,6 +142,7 @@ function buildSharedContext({ config, portfolioContext, tickerContexts, marketDa
     macroData: simplifyMacroData(marketDataSnapshot),
     equityData: simplifyEquitySnapshot(marketDataSnapshot),
     rebalancePreview,
+    rulesEngine: simplifyRulesEngineOutput(rulesEngineOutput),
   };
 }
 
@@ -121,28 +151,33 @@ function buildUserPrompt({ key, sharedContext, priorReports }) {
   const baseInstruction = [
     `Date: ${sharedContext.asOfDate}`,
     `Cycle: ${sharedContext.cycleName}`,
-    "Use only the provided data bundle and the captured symbol universe unless you explicitly say evidence is missing.",
+    sharedContext.rulesEngine
+      ? "Use only the provided rules engine artifact, candidate universe, market data bundle, and broker context unless you explicitly say evidence is missing."
+      : "Use only the provided data bundle and the captured symbol universe unless you explicitly say evidence is missing.",
     "Return Markdown only.",
     "Do not wrap the answer in code fences.",
   ];
+  const rulesEngineBlock = sharedContext.rulesEngine
+    ? `\n\n## Rules Engine Candidate Universe\n${compactJson(sharedContext.rulesEngine, 14_000)}`
+    : "";
 
   if (key === "macro") {
-    return `${baseInstruction.join("\n")}\n\n## Available Symbol Universe\n${sharedContext.symbolUniverse.join(", ")}\n\n## Macro Data\n${compactJson(sharedContext.macroData)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData)}\n\n## Broker Snapshot\n${compactJson(sharedContext.broker, 10_000)}`;
+    return `${baseInstruction.join("\n")}\n\n## Available Symbol Universe\n${sharedContext.symbolUniverse.join(", ")}\n\n## Seed Symbols\n${sharedContext.seedSymbols.join(", ") || "None"}${rulesEngineBlock}\n\n## Macro Data\n${compactJson(sharedContext.macroData)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData)}\n\n## Broker Snapshot\n${compactJson(sharedContext.broker, 10_000)}`;
   }
 
   if (key === "sector") {
-    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "No macro report available.", 12_000)}\n\n## Tradability And Broker Context\n${compactJson(sharedContext.tickerContexts, 10_000)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData)}`;
+    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "No macro report available.", 12_000)}${rulesEngineBlock}\n\n## Tradability And Broker Context\n${compactJson(sharedContext.tickerContexts, 10_000)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData)}`;
   }
 
   if (key === "risk") {
-    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 9_000)}\n\n## Prior Sector Report\n${truncateText(priorReports.sector || "", 12_000)}\n\n## Portfolio Context\n${compactJson(sharedContext.broker, 8_000)}\n\n## Ticker Contexts\n${compactJson(sharedContext.tickerContexts, 8_000)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData, 14_000)}`;
+    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 9_000)}\n\n## Prior Sector Report\n${truncateText(priorReports.sector || "", 12_000)}${rulesEngineBlock}\n\n## Portfolio Context\n${compactJson(sharedContext.broker, 8_000)}\n\n## Ticker Contexts\n${compactJson(sharedContext.tickerContexts, 8_000)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData, 14_000)}`;
   }
 
   if (key === "portfolio") {
-    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 7_000)}\n\n## Prior Sector Report\n${truncateText(priorReports.sector || "", 10_000)}\n\n## Prior Risk Report\n${truncateText(priorReports.risk || "", 12_000)}\n\n## Current Portfolio Context\n${compactJson(sharedContext.broker, 8_000)}\n\n## Configured Target Weights\n${compactJson(sharedContext.configuredTargetWeights, 4_000)}\n\n## Existing Rebalance Preview\n${compactJson(sharedContext.rebalancePreview, 8_000)}`;
+    return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 7_000)}\n\n## Prior Sector Report\n${truncateText(priorReports.sector || "", 10_000)}\n\n## Prior Risk Report\n${truncateText(priorReports.risk || "", 12_000)}${rulesEngineBlock}\n\n## Current Portfolio Context\n${compactJson(sharedContext.broker, 8_000)}\n\n## Configured Target Weights\n${compactJson(sharedContext.configuredTargetWeights, 4_000)}\n\n## Existing Rebalance Preview\n${compactJson(sharedContext.rebalancePreview, 8_000)}`;
   }
 
-  return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 10_000)}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData, 16_000)}\n\n## Ticker Contexts\n${compactJson(sharedContext.tickerContexts, 8_000)}\n\n## Additional Constraint\nTreat this as a separate speculative sleeve. If the captured symbol universe does not contain legitimate micro-cap or high-risk asymmetry, say so explicitly and return fewer ideas.`;
+  return `${baseInstruction.join("\n")}\n\n## Prior Macro Report\n${truncateText(priorReports.macro || "", 10_000)}${rulesEngineBlock}\n\n## Equity Data Bundle\n${compactJson(sharedContext.equityData, 16_000)}\n\n## Ticker Contexts\n${compactJson(sharedContext.tickerContexts, 8_000)}\n\n## Additional Constraint\nTreat this as a separate speculative sleeve. If the rules engine candidate universe does not contain legitimate micro-cap or high-risk asymmetry, say so explicitly and return fewer ideas.`;
 }
 
 
@@ -167,7 +202,7 @@ function getAgentExecutionState(overrides = {}) {
 }
 
 
-async function executeAgentPipeline({ config, cycleRoot, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview, llmOptions } = {}) {
+async function executeAgentPipeline({ config, cycleRoot, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview, rulesEngineOutput, llmOptions } = {}) {
   const llmClient = new OpenAICompatibleLlmClient(llmOptions);
   if (!llmClient.isConfigured()) {
     return getAgentExecutionState(llmOptions);
@@ -179,6 +214,7 @@ async function executeAgentPipeline({ config, cycleRoot, portfolioContext, ticke
     tickerContexts,
     marketDataSnapshot,
     rebalancePreview,
+    rulesEngineOutput,
   });
   const priorReports = {};
 

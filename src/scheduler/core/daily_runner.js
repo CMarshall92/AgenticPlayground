@@ -20,7 +20,8 @@ const {
   captureTickerContexts,
   getCycleRoot,
   initCycle,
-} = require("./pipeline_cycle");
+} = require("./src/pipeline_cycle");
+const { runRulesEngineSelection } = require("./src/rules_engine");
 const { executeAgentPipeline, getAgentExecutionState } = require("../tools/llm/agent_execution");
 
 
@@ -51,27 +52,85 @@ function parseCsvEnv(name, fallbackValue = []) {
 }
 
 
+function parsePositiveIntegerEnv(name, fallbackValue) {
+  const raw = process.env[name];
+  if (raw == null || raw === "") {
+    return fallbackValue;
+  }
+
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive integer.`);
+  }
+
+  return parsed;
+}
+
+
+function parsePositiveNumberEnv(name, fallbackValue) {
+  const raw = process.env[name];
+  if (raw == null || raw === "") {
+    return fallbackValue;
+  }
+
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive number.`);
+  }
+
+  return parsed;
+}
+
+
+function usesDynamicUniverseAgentSet() {
+  return REPORT_FILES.every((report) => report.source.includes("agents/micro_cap_agents/"));
+}
+
+
+function parseSymbolMode(rawValue, fallbackValue) {
+  const normalized = (rawValue || fallbackValue || "configured").trim().toLowerCase();
+  if (!["configured", "rules_engine", "auto"].includes(normalized)) {
+    throw new Error("PIPELINE_SYMBOL_MODE must be one of: configured, rules_engine, auto.");
+  }
+
+  return normalized;
+}
+
+
 function buildDefaultCycleName(now = new Date()) {
   return now.toISOString().slice(0, 10);
 }
 
 
 function buildRunConfig(overrides = {}) {
-  const targetWeights = parseJsonEnv("PIPELINE_TARGET_WEIGHTS", null);
-  const symbolsFromWeights = targetWeights
-    ? Object.keys(targetWeights).filter((ticker) => ticker.toUpperCase() !== "CASH")
+  const dynamicUniverseAgentSet = usesDynamicUniverseAgentSet();
+  const configuredTargetWeights = parseJsonEnv("PIPELINE_TARGET_WEIGHTS", null);
+  const symbolsFromWeights = configuredTargetWeights
+    ? Object.keys(configuredTargetWeights).filter((ticker) => ticker.toUpperCase() !== "CASH")
     : [];
+  const configuredSymbols = parseCsvEnv("PIPELINE_SYMBOLS", symbolsFromWeights);
+  const symbolMode = parseSymbolMode(
+    overrides.symbolMode || process.env.PIPELINE_SYMBOL_MODE,
+    dynamicUniverseAgentSet ? "rules_engine" : "configured"
+  );
+  const effectiveSymbolMode = symbolMode === "auto"
+    ? (configuredSymbols.length > 0 ? "configured" : "rules_engine")
+    : symbolMode;
+  const explicitTargetWeightsProvided = Object.prototype.hasOwnProperty.call(overrides, "targetWeights");
 
   const symbols = overrides.symbols
-    || parseCsvEnv("PIPELINE_SYMBOLS", symbolsFromWeights);
+    || (effectiveSymbolMode === "configured" ? configuredSymbols : []);
   const fredSeries = overrides.fredSeries
     || parseCsvEnv("PIPELINE_FRED_SERIES", []);
   const companyNames = overrides.companyNames
     || parseJsonEnv("PIPELINE_COMPANY_NAMES", {});
   const cikMap = overrides.cikMap
     || parseJsonEnv("PIPELINE_CIK_MAP", {});
+  const targetWeights = explicitTargetWeightsProvided
+    ? overrides.targetWeights
+    : (effectiveSymbolMode === "configured" ? configuredTargetWeights : null);
 
-  if (!Array.isArray(symbols) || symbols.length === 0) {
+  if (effectiveSymbolMode === "configured" && (!Array.isArray(symbols) || symbols.length === 0)) {
     throw new Error("At least one symbol is required. Set PIPELINE_SYMBOLS or PIPELINE_TARGET_WEIGHTS.");
   }
 
@@ -79,12 +138,18 @@ function buildRunConfig(overrides = {}) {
     cycleName: overrides.cycleName || process.env.PIPELINE_CYCLE_NAME || buildDefaultCycleName(),
     runType: overrides.runType || process.env.PIPELINE_RUN_TYPE || "daily",
     triggerSource: overrides.triggerSource || process.env.PIPELINE_TRIGGER_SOURCE || "manual",
+    symbolMode: effectiveSymbolMode,
+    seedSymbols: overrides.seedSymbols || configuredSymbols,
     symbols,
     fredSeries,
     companyNames,
     cikMap,
     newsLimit: overrides.newsLimit || Number(process.env.PIPELINE_NEWS_LIMIT || 5),
-    targetWeights: overrides.targetWeights || targetWeights,
+    targetWeights: explicitTargetWeightsProvided ? overrides.targetWeights : targetWeights,
+    rulesEngineCandidateLimit: overrides.rulesEngineCandidateLimit || parsePositiveIntegerEnv("RULES_ENGINE_CANDIDATE_LIMIT", 10),
+    rulesEngineRawLimit: overrides.rulesEngineRawLimit || parsePositiveIntegerEnv("RULES_ENGINE_RAW_LIMIT", 18),
+    rulesEngineMaxMarketCap: overrides.rulesEngineMaxMarketCap || parsePositiveNumberEnv("RULES_ENGINE_MAX_MARKET_CAP", 500_000_000),
+    rulesEngineQueryTerms: overrides.rulesEngineQueryTerms,
   };
 }
 
@@ -116,6 +181,15 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
   const targetWeightLines = config.targetWeights
     ? Object.entries(config.targetWeights).map(([ticker, weight]) => `- ${ticker}: ${weight}%`)
     : ["- No target weights configured for this run."];
+  const rulesEngineSummary = config.rulesEngineSummary || null;
+  const rulesEngineLines = rulesEngineSummary
+    ? [
+        `- Symbol mode: ${config.symbolMode}`,
+        `- Seed symbols: ${config.seedSymbols.length > 0 ? config.seedSymbols.join(", ") : "None"}`,
+        `- Rules engine raw candidates: ${rulesEngineSummary.rawCandidateCount}`,
+        `- Rules engine selected symbols: ${rulesEngineSummary.selectedSymbols.join(", ") || "None"}`,
+      ]
+    : [`- Symbol mode: ${config.symbolMode}`, `- Symbol universe came from configured pipeline symbols.`];
 
   return `# Daily Pipeline Summary\n\n`
     + `Run ID: ${runId}\n`
@@ -125,6 +199,8 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
     + `- Symbols: ${config.symbols.join(", ")}\n`
     + `- Macro series: ${config.fredSeries.length > 0 ? config.fredSeries.join(", ") : "None configured"}\n`
     + `- Providers available: ${Object.entries(providerAvailability).filter(([, enabled]) => enabled).map(([name]) => name).join(", ") || "None"}\n\n`
+    + `## Rules Engine\n\n`
+    + `${rulesEngineLines.join("\n")}\n\n`
     + `## Broker Snapshot\n\n`
     + `- Total positions captured: ${positionsCount}\n`
     + `- Pending orders captured: ${pendingOrdersCount}\n`
@@ -149,7 +225,9 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
     + `## Current Limitation\n\n`
     + `- This runner persists collected data, report files, and a final pipeline summary to Postgres.\n`
     + `${llmState.generated
-      ? "- Symbol discovery is still limited to the configured pipeline symbol universe and the captured data bundle for the current run.\n"
+      ? (config.symbolMode === "rules_engine"
+        ? "- The rules engine uses broker-tradable instruments seeded by market news and insider activity, then builds per-ticker snapshots only for the selected candidates.\n"
+        : "- Report generation uses the configured pipeline symbol universe and the captured data bundle for the current run.\n")
       : "- If no compatible LLM is configured, the data pipeline still runs but the report files stay in template/manual mode.\n"}`;
 }
 
@@ -196,7 +274,41 @@ async function persistReportFiles(runId, cycleRoot) {
 
 
 async function runDailyPipeline(overrides = {}) {
-  const config = buildRunConfig(overrides);
+  let config = buildRunConfig(overrides);
+  let rulesEngineOutput = null;
+
+  if (config.symbolMode === "rules_engine") {
+    rulesEngineOutput = await runRulesEngineSelection({
+      seedSymbols: config.seedSymbols,
+      maxCandidates: config.rulesEngineCandidateLimit,
+      rawCandidateLimit: config.rulesEngineRawLimit,
+      maxMarketCap: config.rulesEngineMaxMarketCap,
+      newsLimit: config.newsLimit,
+      queryTerms: config.rulesEngineQueryTerms,
+    });
+
+    if (!Array.isArray(rulesEngineOutput.selectedSymbols) || rulesEngineOutput.selectedSymbols.length === 0) {
+      throw new Error("The rules engine did not produce any tradable candidates. Adjust the rules settings or provider coverage.");
+    }
+
+    config = {
+      ...config,
+      symbols: rulesEngineOutput.selectedSymbols,
+      companyNames: {
+        ...rulesEngineOutput.companyNames,
+        ...config.companyNames,
+      },
+      cikMap: {
+        ...rulesEngineOutput.cikMap,
+        ...config.cikMap,
+      },
+      rulesEngineSummary: {
+        rawCandidateCount: rulesEngineOutput.rawCandidateCount,
+        selectedSymbols: rulesEngineOutput.selectedSymbols,
+      },
+    };
+  }
+
   await initCycle(config.cycleName);
   const agentExecutionState = getAgentExecutionState(overrides.llm);
 
@@ -207,12 +319,29 @@ async function runDailyPipeline(overrides = {}) {
     config,
     metadata: {
       outputRoot: OUTPUT_ROOT,
+      symbolMode: config.symbolMode,
     },
   });
 
   const cycleRoot = getCycleRoot(config.cycleName);
 
   try {
+    if (rulesEngineOutput) {
+      const rulesEnginePath = path.join(cycleRoot, "data", "rules_engine_output.json");
+      await fs.writeFile(rulesEnginePath, `${JSON.stringify(rulesEngineOutput, null, 2)}\n`, "utf8");
+      await upsertPipelineArtifact({
+        runId: run.id,
+        artifactType: "rules_engine",
+        artifactKey: "candidate_selection",
+        filePath: rulesEnginePath,
+        contentJson: rulesEngineOutput,
+        metadata: {
+          selectedCount: rulesEngineOutput.selectedSymbols.length,
+          rawCandidateCount: rulesEngineOutput.rawCandidateCount,
+        },
+      });
+    }
+
     const portfolioCapture = await capturePortfolioContext(config.cycleName);
     const portfolioContext = await readJsonFile(portfolioCapture.destination);
     await upsertPipelineArtifact({
@@ -274,6 +403,7 @@ async function runDailyPipeline(overrides = {}) {
       tickerContexts,
       marketDataSnapshot,
       rebalancePreview,
+      rulesEngineOutput,
       llmOptions: overrides.llm,
     });
 
@@ -320,6 +450,8 @@ async function runDailyPipeline(overrides = {}) {
       completedAt: new Date(),
       metadata: {
         symbolsProcessed: config.symbols.length,
+        symbolMode: config.symbolMode,
+        rulesEngineSelectedCount: rulesEngineOutput?.selectedSymbols?.length || 0,
         reportFilesPersisted: reportSnapshots.length,
         finalReportPath,
         llmExecution: agentExecution,

@@ -5,12 +5,12 @@ const {
   buildBrokerRebalancePreview,
   getPortfolioBrokerContext,
   getTickerBrokerContext,
-} = require("../tools/trading212/trading212_agent_tools");
+} = require("../../tools/trading212/trading212_agent_tools");
 const {
   getEquityDataSnapshot,
   getMacroDataSnapshot,
   providerStatus,
-} = require("../tools/market_data/market_data_agent_tools");
+} = require("../../tools/market_data/market_data_agent_tools");
 
 
 const WORKSPACE_ROOT = path.resolve(__dirname, "..");
@@ -20,32 +20,32 @@ const REPORT_FILES = [
   {
     key: "macro",
     fileName: "01_macro_report.md",
-    title: "Macro Strategist Output",
-    source: "agents/01_macro_strategist.md",
+    title: "Microcap Trend Scanner Output",
+    source: "agents/micro_cap_agents/01_macro_strategist.md",
   },
   {
     key: "sector",
     fileName: "02_sector_report.md",
-    title: "Sector Analyst Output",
-    source: "agents/02_sector_analyst.md",
+    title: "Microcap Universe Scout Output",
+    source: "agents/micro_cap_agents/02_sector_analyst.md",
   },
   {
     key: "risk",
     fileName: "03_risk_report.md",
-    title: "Risk Manager Output",
-    source: "agents/03_risk_manager.md",
+    title: "Investment Standards Review Output",
+    source: "agents/micro_cap_agents/03_risk_manager.md",
   },
   {
     key: "portfolio",
     fileName: "04_portfolio_report.md",
-    title: "Portfolio Manager Output",
-    source: "agents/04_portfolio_manager.md",
+    title: "Microcap Portfolio Manager Output",
+    source: "agents/micro_cap_agents/04_portfolio_manager.md",
   },
   {
     key: "yolo",
     fileName: "05_yolo_microcap_report.md",
-    title: "YOLO Microcap Output",
-    source: "agents/05_yolo_microcap.md",
+    title: "Microcap Catalyst Hunter Output",
+    source: "agents/micro_cap_agents/05_yolo_microcap.md",
   },
 ];
 
