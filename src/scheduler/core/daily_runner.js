@@ -148,7 +148,8 @@ function buildRunConfig(overrides = {}) {
     targetWeights: explicitTargetWeightsProvided ? overrides.targetWeights : targetWeights,
     rulesEngineCandidateLimit: overrides.rulesEngineCandidateLimit || parsePositiveIntegerEnv("RULES_ENGINE_CANDIDATE_LIMIT", 10),
     rulesEngineRawLimit: overrides.rulesEngineRawLimit || parsePositiveIntegerEnv("RULES_ENGINE_RAW_LIMIT", 18),
-    rulesEngineMaxMarketCap: overrides.rulesEngineMaxMarketCap || parsePositiveNumberEnv("RULES_ENGINE_MAX_MARKET_CAP", 500_000_000),
+    rulesEngineMaxMarketCap: overrides.rulesEngineMaxMarketCap || parsePositiveNumberEnv("RULES_ENGINE_MAX_MARKET_CAP", 300_000_000),
+    rulesEngineInsiderRows: overrides.rulesEngineInsiderRows || parsePositiveIntegerEnv("RULES_ENGINE_INSIDER_ROWS", 40),
     rulesEngineQueryTerms: overrides.rulesEngineQueryTerms,
   };
 }
@@ -186,8 +187,16 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
     ? [
         `- Symbol mode: ${config.symbolMode}`,
         `- Seed symbols: ${config.seedSymbols.length > 0 ? config.seedSymbols.join(", ") : "None"}`,
+        `- Instrument universe source: ${rulesEngineSummary.instrumentUniverseSource || "Unknown"}`,
+        `- Eligible universe size: ${rulesEngineSummary.eligibleInstrumentCount}`,
+        `- Step 1 universe shortlist: ${rulesEngineSummary.universeShortlistedCount || 0}`,
         `- Rules engine raw candidates: ${rulesEngineSummary.rawCandidateCount}`,
+        `- Step 2 screening pool: ${rulesEngineSummary.screeningPoolCount || 0}`,
+        `- Step 2 shortlisted for enrichment: ${rulesEngineSummary.shortlistedForEnrichmentCount || 0}`,
         `- Rules engine selected symbols: ${rulesEngineSummary.selectedSymbols.join(", ") || "None"}`,
+        ...(rulesEngineSummary.instrumentUniverseFallbackReason
+          ? [`- Instrument universe fallback reason: ${rulesEngineSummary.instrumentUniverseFallbackReason}`]
+          : []),
       ]
     : [`- Symbol mode: ${config.symbolMode}`, `- Symbol universe came from configured pipeline symbols.`];
 
@@ -226,7 +235,7 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
     + `- This runner persists collected data, report files, and a final pipeline summary to Postgres.\n`
     + `${llmState.generated
       ? (config.symbolMode === "rules_engine"
-        ? "- The rules engine uses broker-tradable instruments seeded by market news and insider activity, then builds per-ticker snapshots only for the selected candidates.\n"
+        ? "- The rules engine now builds a broker-tradable eligible universe, runs a lightweight step-2 screening pass, and then builds deeper per-ticker snapshots only for the shortlisted candidates.\n"
         : "- Report generation uses the configured pipeline symbol universe and the captured data bundle for the current run.\n")
       : "- If no compatible LLM is configured, the data pipeline still runs but the report files stay in template/manual mode.\n"}`;
 }
@@ -284,6 +293,7 @@ async function runDailyPipeline(overrides = {}) {
       rawCandidateLimit: config.rulesEngineRawLimit,
       maxMarketCap: config.rulesEngineMaxMarketCap,
       newsLimit: config.newsLimit,
+      insiderRows: config.rulesEngineInsiderRows,
       queryTerms: config.rulesEngineQueryTerms,
     });
 
@@ -303,7 +313,13 @@ async function runDailyPipeline(overrides = {}) {
         ...config.cikMap,
       },
       rulesEngineSummary: {
+        instrumentUniverseSource: rulesEngineOutput.instrumentUniverse?.source || "unknown",
+        instrumentUniverseFallbackReason: rulesEngineOutput.instrumentUniverse?.fallbackReason || null,
+        eligibleInstrumentCount: rulesEngineOutput.eligibleUniverseSummary?.eligibleInstrumentCount || 0,
+        universeShortlistedCount: rulesEngineOutput.universeScreeningSummary?.shortlistedCount || 0,
         rawCandidateCount: rulesEngineOutput.rawCandidateCount,
+        screeningPoolCount: rulesEngineOutput.screeningSummary?.screeningPoolCount || 0,
+        shortlistedForEnrichmentCount: rulesEngineOutput.screeningSummary?.shortlistedForEnrichmentCount || 0,
         selectedSymbols: rulesEngineOutput.selectedSymbols,
       },
     };
@@ -327,15 +343,78 @@ async function runDailyPipeline(overrides = {}) {
 
   try {
     if (rulesEngineOutput) {
+      const eligibleUniversePath = path.join(cycleRoot, "data", "eligible_microcap_universe.json");
+      await fs.writeFile(eligibleUniversePath, `${JSON.stringify({
+        generatedAt: rulesEngineOutput.generatedAt,
+        config: rulesEngineOutput.config,
+        eligibleUniverseSummary: rulesEngineOutput.eligibleUniverseSummary,
+        eligibleUniverse: rulesEngineOutput.eligibleUniverse,
+      }, null, 2)}\n`, "utf8");
+      await upsertPipelineArtifact({
+        runId: run.id,
+        artifactType: "rules_engine",
+        artifactKey: "eligible_microcap_universe",
+        filePath: eligibleUniversePath,
+        contentJson: {
+          eligibleUniverseSummary: rulesEngineOutput.eligibleUniverseSummary,
+        },
+      });
+
+      const universeScreenPath = path.join(cycleRoot, "data", "screened_universe_candidates.json");
+      await fs.writeFile(universeScreenPath, `${JSON.stringify({
+        generatedAt: rulesEngineOutput.generatedAt,
+        config: rulesEngineOutput.config,
+        universeScreeningSummary: rulesEngineOutput.universeScreeningSummary,
+        screenedUniverseCandidates: rulesEngineOutput.screenedUniverseCandidates,
+      }, null, 2)}\n`, "utf8");
+      await upsertPipelineArtifact({
+        runId: run.id,
+        artifactType: "rules_engine",
+        artifactKey: "universe_screening_stage",
+        filePath: universeScreenPath,
+        contentJson: {
+          universeScreeningSummary: rulesEngineOutput.universeScreeningSummary,
+          screenedUniverseCandidates: rulesEngineOutput.screenedUniverseCandidates,
+        },
+        metadata: {
+          shortlistedCount: rulesEngineOutput.universeScreeningSummary?.shortlistedCount || 0,
+          priceScreenedCount: rulesEngineOutput.universeScreeningSummary?.priceScreenedCount || 0,
+        },
+      });
+
+      const screeningPath = path.join(cycleRoot, "data", "screened_candidates.json");
+      await fs.writeFile(screeningPath, `${JSON.stringify({
+        generatedAt: rulesEngineOutput.generatedAt,
+        config: rulesEngineOutput.config,
+        screeningSummary: rulesEngineOutput.screeningSummary,
+        screenedCandidates: rulesEngineOutput.screenedCandidates,
+      }, null, 2)}\n`, "utf8");
+      await upsertPipelineArtifact({
+        runId: run.id,
+        artifactType: "rules_engine",
+        artifactKey: "screening_stage",
+        filePath: screeningPath,
+        contentJson: {
+          screeningSummary: rulesEngineOutput.screeningSummary,
+          screenedCandidates: rulesEngineOutput.screenedCandidates,
+        },
+        metadata: {
+          screeningPoolCount: rulesEngineOutput.screeningSummary?.screeningPoolCount || 0,
+          shortlistedForEnrichmentCount: rulesEngineOutput.screeningSummary?.shortlistedForEnrichmentCount || 0,
+        },
+      });
+
       const rulesEnginePath = path.join(cycleRoot, "data", "rules_engine_output.json");
-      await fs.writeFile(rulesEnginePath, `${JSON.stringify(rulesEngineOutput, null, 2)}\n`, "utf8");
+  const { eligibleUniverse, screenedUniverseCandidates, screenedCandidates, ...rulesEngineArtifact } = rulesEngineOutput;
+      await fs.writeFile(rulesEnginePath, `${JSON.stringify(rulesEngineArtifact, null, 2)}\n`, "utf8");
       await upsertPipelineArtifact({
         runId: run.id,
         artifactType: "rules_engine",
         artifactKey: "candidate_selection",
         filePath: rulesEnginePath,
-        contentJson: rulesEngineOutput,
+        contentJson: rulesEngineArtifact,
         metadata: {
+          eligibleInstrumentCount: rulesEngineOutput.eligibleUniverseSummary?.eligibleInstrumentCount || 0,
           selectedCount: rulesEngineOutput.selectedSymbols.length,
           rawCandidateCount: rulesEngineOutput.rawCandidateCount,
         },

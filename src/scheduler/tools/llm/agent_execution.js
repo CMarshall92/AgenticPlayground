@@ -106,9 +106,28 @@ function simplifyRulesEngineOutput(rulesEngineOutput) {
   }
 
   return {
+    eligibleUniverseSummary: rulesEngineOutput.eligibleUniverseSummary || null,
+    universeScreeningSummary: rulesEngineOutput.universeScreeningSummary || null,
+    screeningSummary: rulesEngineOutput.screeningSummary || null,
     seedSymbols: rulesEngineOutput.seedSymbols || [],
     queryTerms: rulesEngineOutput.queryTerms || [],
     rawCandidateCount: rulesEngineOutput.rawCandidateCount || 0,
+    screenedUniverseCandidates: (rulesEngineOutput.screenedUniverseCandidates || []).slice(0, 20).map((candidate) => ({
+      symbol: candidate.symbol,
+      companyName: candidate.companyName,
+      screeningScore: candidate.screeningScore,
+      screeningSignals: candidate.screeningSignals,
+      instrument: candidate.instrument,
+    })),
+    screenedCandidates: (rulesEngineOutput.screenedCandidates || []).slice(0, 15).map((candidate) => ({
+      symbol: candidate.symbol,
+      companyName: candidate.companyName,
+      screeningScore: candidate.screeningScore,
+      screeningSignals: candidate.screeningSignals,
+      sourceTypes: candidate.sourceTypes,
+      catalystSignals: candidate.catalystSignals,
+      mentionCount: candidate.mentionCount,
+    })),
     selectedSymbols: rulesEngineOutput.selectedSymbols || [],
     sourceBreakdown: rulesEngineOutput.sourceBreakdown || {},
     candidates: (rulesEngineOutput.candidates || []).map((candidate) => ({
@@ -117,6 +136,8 @@ function simplifyRulesEngineOutput(rulesEngineOutput) {
       marketCap: candidate.marketCap,
       selectionBucket: candidate.selectionBucket,
       score: candidate.score,
+      screeningScore: candidate.screeningScore,
+      screeningSignals: candidate.screeningSignals,
       sourceTypes: candidate.sourceTypes,
       catalystSignals: candidate.catalystSignals,
       mentionCount: candidate.mentionCount,

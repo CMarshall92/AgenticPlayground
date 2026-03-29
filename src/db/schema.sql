@@ -12,6 +12,21 @@ CREATE TABLE IF NOT EXISTS provider_usage_windows (
 CREATE INDEX IF NOT EXISTS idx_provider_usage_windows_provider_updated_at
   ON provider_usage_windows (provider, updated_at DESC);
 
+CREATE TABLE IF NOT EXISTS broker_instrument_universes (
+  provider TEXT NOT NULL,
+  environment TEXT NOT NULL,
+  instrument_count INTEGER NOT NULL DEFAULT 0 CHECK (instrument_count >= 0),
+  instruments JSONB NOT NULL DEFAULT '[]'::jsonb,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  fetched_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (provider, environment)
+);
+
+CREATE INDEX IF NOT EXISTS idx_broker_instrument_universes_fetched_at
+  ON broker_instrument_universes (fetched_at DESC);
+
 CREATE TABLE IF NOT EXISTS pipeline_runs (
   id BIGSERIAL PRIMARY KEY,
   cycle_name TEXT NOT NULL,
