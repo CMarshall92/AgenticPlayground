@@ -1,0 +1,1158 @@
+{
+  "generatedAt": "2026-03-29T04:44:52.964Z",
+  "config": {
+    "maxCandidates": 10,
+    "rawCandidateLimit": 18,
+    "enableUniverseScreening": true,
+    "includeUniverseScreenSeeds": true,
+    "universeShortlistLimit": 60,
+    "universePriceScreenLimit": 40,
+    "screeningLimit": 30,
+    "enableLightweightScreening": true,
+    "screeningLookbackDays": 30,
+    "screeningMomentumDays": 20,
+    "minMarketCap": 50000000,
+    "maxMarketCap": 1000000000,
+    "allowUnknownMarketCap": true,
+    "includeNearLimit": true,
+    "nearLimitMultiple": 2,
+    "newsLimit": 5,
+    "insiderRows": 40,
+    "newsProfile": "general_mixed",
+    "queryTerms": [
+      "contract win",
+      "regulatory approval",
+      "acquisition",
+      "resource discovery",
+      "clinical trial",
+      "plant opening"
+    ],
+    "includeSeedSymbols": true,
+    "enableMarketNews": true,
+    "enableNewsData": true,
+    "enableOpenInsider": true,
+    "marketNewsLimitMultiplier": 4,
+    "marketScopeProfile": "us_uk_europe",
+    "allowedInstrumentTypes": [
+      "STOCK"
+    ],
+    "allowedCurrencies": [],
+    "allowedIsinCountryPrefixes": [
+      "US",
+      "GB",
+      "IE",
+      "FR",
+      "DE",
+      "NL",
+      "BE",
+      "LU",
+      "CH",
+      "AT",
+      "DK",
+      "SE",
+      "NO",
+      "FI",
+      "ES",
+      "IT",
+      "PT",
+      "PL",
+      "CZ",
+      "HU",
+      "GR"
+    ],
+    "excludedIsinCountryPrefixes": [],
+    "allowedScheduleIds": [],
+    "excludedScheduleIds": [],
+    "requireExtendedHours": false,
+    "minMaxOpenQuantity": 0,
+    "minInstrumentAgeDays": 0,
+    "excludedSymbolPatterns": [],
+    "excludedNamePatterns": [
+      "WARRANT",
+      "RIGHT",
+      "UNIT",
+      "ACQUISITION CORP",
+      "CAPITAL CORP",
+      "HOLDINGS CORP",
+      "BLANK CHECK",
+      "SPAC",
+      "SHELL",
+      "ROYALTY",
+      "TRUST",
+      "FUND",
+      "ETF",
+      "ETN",
+      "ADR",
+      "GDR"
+    ],
+    "weightMentionCount": 3,
+    "weightSourceDiversity": 4,
+    "weightNewsSignal": 1,
+    "weightInsiderSignal": 1,
+    "weightScreeningStage": 1.5,
+    "weightWithinMarketCap": 6,
+    "weightHasMarketCap": 2,
+    "weightScreenPriceMomentum": 4,
+    "weightScreenVolumeSurge": 3,
+    "weightScreenLiquidity": 2,
+    "weightScreenInstrumentAge": 1,
+    "weightScreenInsiderSource": 2,
+    "weightScreenSeedSource": 1,
+    "maxNewsScore": 8,
+    "maxInsiderScore": 5,
+    "maxScreenPriceMomentumPct": 40,
+    "maxScreenVolumeMultiple": 4,
+    "maxScreenLiquidityLog": 6,
+    "maxScreenInstrumentAgeDays": 365,
+    "universeSampleSize": 50
+  },
+  "universeScreeningSummary": {
+    "screeningEnabled": true,
+    "includeUniverseScreenSeeds": true,
+    "metadataRankedCount": 8387,
+    "priceScreenedCount": 40,
+    "shortlistedCount": 40
+  },
+  "screenedUniverseCandidates": [
+    {
+      "symbol": "RXRX",
+      "companyName": "Recursion Pharmaceuticals",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "RXRX_US_EQ",
+        "name": "Recursion Pharmaceuticals",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 2.94,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1247062,
+        "ageDays": 1804
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "CLSK",
+      "companyName": "Cleanspark",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "CLSK_US_EQ",
+        "name": "Cleanspark",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 8.66,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1343552,
+        "ageDays": 1999
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "BBAI",
+      "companyName": "BigBear.ai",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GIG_US_EQ",
+        "name": "BigBear.ai",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 3.14,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2869280,
+        "ageDays": 1822
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "MIRI",
+      "companyName": "Mirriad Advertising",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "MIRIl_EQ",
+        "name": "Mirriad Advertising",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 8125000,
+        "ageDays": 2265
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "OIBRQ",
+      "companyName": "Oi",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "OIBRQ_US_EQ",
+        "name": "Oi",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 6500000,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "CDL",
+      "companyName": "Cloudbreak Discovery",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "CDLl_EQ",
+        "name": "Cloudbreak Discovery",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 73.5509,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1557145,
+        "ageDays": 1757
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SOUN",
+      "companyName": "SoundHound AI",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "SOUN_US_EQ",
+        "name": "SoundHound AI",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 5.9,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1582126,
+        "ageDays": 1165
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "ACHR",
+      "companyName": "Archer Aviation",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "ACIC_US_EQ",
+        "name": "Archer Aviation",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 5.09,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1855205,
+        "ageDays": 1930
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "BARC",
+      "companyName": "Barclays",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "BARCl_EQ",
+        "name": "Barclays",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1190042,
+        "ageDays": 2817
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "CAN",
+      "companyName": "Canaan",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "CAN_US_EQ",
+        "name": "Canaan",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.4105,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1298717,
+        "ageDays": 2254
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "LLOY",
+      "companyName": "Lloyds Banking Group",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "LLOYl_EQ",
+        "name": "Lloyds Banking Group",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 4860356,
+        "ageDays": 2817
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "RDW",
+      "companyName": "Redwire",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GNPK_US_EQ",
+        "name": "Redwire",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 8.16,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1348904,
+        "ageDays": 1899
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "RR",
+      "companyName": "Richtech Robotics",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "RR_US_EQ",
+        "name": "Richtech Robotics",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 2,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 3045846,
+        "ageDays": 862
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "ONDS",
+      "companyName": "Ondas",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "ONDS_US_EQ",
+        "name": "Ondas",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 8.8,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1397626,
+        "ageDays": 1898
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "ABEV",
+      "companyName": "Ambev",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "ABEV_US_EQ",
+        "name": "Ambev",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 2.81,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1216944,
+        "ageDays": 1999
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "KOD",
+      "companyName": "Kodal Minerals",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "KODl_EQ",
+        "name": "Kodal Minerals",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 37,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 9340686,
+        "ageDays": 2231
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "GTCH",
+      "companyName": "GBT Technologies",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GTCH_US_EQ",
+        "name": "GBT Technologies",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.0001,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 3250000,
+        "ageDays": 1893
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "KEFI",
+      "companyName": "Kefi Gold and Copper",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "KEFIl_EQ",
+        "name": "Kefi Gold and Copper",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 3448276,
+        "ageDays": 2249
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SRXH",
+      "companyName": "SRX Health Solutions",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "BTTR_US_EQ",
+        "name": "SRX Health Solutions",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.1179,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1073138,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "LGIQ",
+      "companyName": "Logiq",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "LGIQ_US_EQ",
+        "name": "Logiq",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.000001,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 650000000,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SYME",
+      "companyName": "Supply@Me Capital",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "SYMEl_EQ",
+        "name": "Supply@Me Capital",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 13000000,
+        "ageDays": 2047
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "GAXYQ",
+      "companyName": "Galaxy Next Generation",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GAXY_US_EQ",
+        "name": "Galaxy Next Generation",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1666667,
+        "ageDays": 1954
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "JAYL",
+      "companyName": "80 Mile PLC",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "JAYl_EQ",
+        "name": "80 Mile PLC",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 4901961,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SNAP",
+      "companyName": "Snap",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "SNAP_US_EQ",
+        "name": "Snap",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 3.93,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2594444,
+        "ageDays": 2817
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "QUBT",
+      "companyName": "Quantum Computing",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "QUBT_US_EQ",
+        "name": "Quantum Computing",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 6.66,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1026835,
+        "ageDays": 1873
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "TLSS",
+      "companyName": "Transportation and Logistics Systems",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "TLSS_US_EQ",
+        "name": "Transportation and Logistics Systems",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.0001,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 5000000,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SAN",
+      "companyName": "Banco Santander",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "SANe_EQ",
+        "name": "Banco Santander",
+        "type": "STOCK",
+        "currencyCode": "EUR"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 10.65,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1073734,
+        "ageDays": 1717
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "OPEN",
+      "companyName": "Opendoor Technologies",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "IPOB_US_EQ",
+        "name": "Opendoor Technologies",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 4.8,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2775205,
+        "ageDays": 2045
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "RRR",
+      "companyName": "Red Rock Resources",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "RRRl_EQ",
+        "name": "Red Rock Resources",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 53.89,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2407407,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "BBD",
+      "companyName": "Banco Bradesco",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "BBD_US_EQ",
+        "name": "Banco Bradesco",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 3.49,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2232551,
+        "ageDays": 1999
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "COMP",
+      "companyName": "Compass",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "COMP_US_EQ",
+        "name": "Compass",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 7.08,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1092618,
+        "ageDays": 1822
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "ALRT",
+      "companyName": "Defence Holdings",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GILDl_EQ",
+        "name": "Defence Holdings",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1220581,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "PLUG",
+      "companyName": "Plug Power",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "PLUG_US_EQ",
+        "name": "Plug Power",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 2.18,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 5993053,
+        "ageDays": 2269
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "EOSE",
+      "companyName": "Eos Energy Enterprises",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "BMRG_US_EQ",
+        "name": "Eos Energy Enterprises",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 4.86,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1100162,
+        "ageDays": 2033
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "ALEUP",
+      "companyName": "Europlasma",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "ALEUPp_EQ",
+        "name": "Europlasma",
+        "type": "STOCK",
+        "currencyCode": "EUR"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1239983,
+        "ageDays": 1997
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "PATH",
+      "companyName": "UiPath",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "PATH_US_EQ",
+        "name": "UiPath",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 10.69,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1050659,
+        "ageDays": 1802
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "HCMC",
+      "companyName": "Healthier Choices Management Corp",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "HCMC_US_EQ",
+        "name": "Healthier Choices Management Corp",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.00001,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 6500000,
+        "ageDays": 1963
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "BYND",
+      "companyName": "Beyond Meat",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "BYND1_US_EQ",
+        "name": "Beyond Meat",
+        "type": "STOCK",
+        "currencyCode": "USD"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 0.6371,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2529282,
+        "ageDays": 2521
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "VOD",
+      "companyName": "Vodafone",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "VODl_EQ",
+        "name": "Vodafone",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": 14.49,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 2805078,
+        "ageDays": 2817
+      },
+      "sourceNotes": []
+    },
+    {
+      "symbol": "SVNS",
+      "companyName": "Solvonis Therapeutics",
+      "screeningScore": 3,
+      "tradable": true,
+      "instrument": {
+        "ticker": "GPLl_EQ",
+        "name": "Solvonis Therapeutics",
+        "type": "STOCK",
+        "currencyCode": "GBX"
+      },
+      "sourceTypes": [],
+      "catalystSignals": [],
+      "mentionCount": 0,
+      "screeningSignals": {
+        "latestPrice": null,
+        "momentumPct": null,
+        "latestVolume": null,
+        "averageVolume": null,
+        "volumeMultiple": null,
+        "observedPriceCount": 0,
+        "maxOpenQuantity": 1862816,
+        "ageDays": 1541
+      },
+      "sourceNotes": []
+    }
+  ]
+}

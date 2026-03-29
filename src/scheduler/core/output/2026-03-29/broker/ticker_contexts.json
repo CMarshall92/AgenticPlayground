@@ -1,0 +1,545 @@
+[
+  {
+    "ticker": "SAN",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": true,
+      "value": {
+        "query": "SAN",
+        "environment": "demo",
+        "found": true,
+        "exactMatch": true,
+        "tradable": true,
+        "instrument": {
+          "ticker": "SAN_US_EQ",
+          "type": "STOCK",
+          "workingScheduleId": 56,
+          "isin": "US05964H1059",
+          "currencyCode": "USD",
+          "name": "Banco Santander",
+          "shortName": "SAN",
+          "maxOpenQuantity": 565467,
+          "extendedHours": true,
+          "addedOn": "2020-10-06T18:50:56.000+03:00"
+        },
+        "alternatives": [
+          {
+            "ticker": "SANe_EQ",
+            "type": "STOCK",
+            "workingScheduleId": 74,
+            "isin": "ES0113900J37",
+            "currencyCode": "EUR",
+            "name": "Banco Santander",
+            "shortName": "SAN",
+            "maxOpenQuantity": 1073734,
+            "extendedHours": false,
+            "addedOn": "2021-07-15T10:45:48.000+03:00"
+          },
+          {
+            "ticker": "SANp_EQ",
+            "type": "STOCK",
+            "workingScheduleId": 76,
+            "isin": "FR0000120578",
+            "currencyCode": "EUR",
+            "name": "Sanofi",
+            "shortName": "SAN",
+            "maxOpenQuantity": 106562,
+            "extendedHours": false,
+            "addedOn": "2019-07-04T09:12:12.000+03:00"
+          }
+        ],
+        "rateLimit": {
+          "limit": "1",
+          "period": "5",
+          "remaining": "0",
+          "reset": "1774759492",
+          "used": "1"
+        }
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "CLSK",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "OIBRQ",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "1",
+      "remaining": "0",
+      "reset": "1774759488",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "SOUN",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "1",
+      "remaining": "0",
+      "reset": "1774759488",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "ACHR",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "BARC",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "LLOY",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "RDW",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"type\":\"/api-errors/entity-not-found\",\"title\":\"Requested entity not found\",\"status\":404,\"detail\":\"Provided ticker 'RDW' does not exist\",\"traceId\":\"ae89e6ac0b833562465ec332f2c76185\"}",
+      "statusCode": 404,
+      "payload": {
+        "type": "/api-errors/entity-not-found",
+        "title": "Requested entity not found",
+        "status": 404,
+        "detail": "Provided ticker 'RDW' does not exist",
+        "traceId": "ae89e6ac0b833562465ec332f2c76185"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "1",
+      "remaining": "0",
+      "reset": "1774759490",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "ONDS",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  },
+  {
+    "ticker": "RXRX",
+    "environment": "demo",
+    "tradability": {
+      "label": "tradability",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "positions": {
+      "label": "positions",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "pendingOrders": {
+      "label": "pendingOrders",
+      "ok": false,
+      "error": "{\"code\":\"BusinessException\",\"context\":{\"type\":\"TooManyRequests\"},\"errorMessage\":\"too many requests\"}",
+      "statusCode": 429,
+      "payload": {
+        "code": "BusinessException",
+        "context": {
+          "type": "TooManyRequests"
+        },
+        "errorMessage": "too many requests"
+      }
+    },
+    "rateLimit": {
+      "limit": "1",
+      "period": "5",
+      "remaining": "0",
+      "reset": "1774759492",
+      "used": "1"
+    }
+  }
+]

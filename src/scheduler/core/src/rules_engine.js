@@ -158,6 +158,31 @@ function normalizeSymbol(value) {
 }
 
 
+function resolveBrokerSymbol(instrument) {
+  const shortNameSymbol = normalizeSymbol(instrument?.shortName);
+  if (shortNameSymbol) {
+    return shortNameSymbol;
+  }
+
+  const brokerTicker = String(instrument?.ticker || "").trim().toUpperCase();
+  if (!brokerTicker) {
+    return null;
+  }
+
+  const simplifiedTicker = brokerTicker
+    .replace(/_[A-Z]{2,}_EQ$/i, "")
+    .replace(/_EQ$/i, "")
+    .replace(/d_EQ$/i, "")
+    .replace(/l_EQ$/i, "")
+    .replace(/_US$/i, "")
+    .replace(/_CA$/i, "")
+    .replace(/_GB$/i, "")
+    .trim();
+
+  return normalizeSymbol(simplifiedTicker);
+}
+
+
 function parsePositiveInteger(rawValue, fallbackValue) {
   if (rawValue == null || rawValue === "") {
     return fallbackValue;
@@ -273,6 +298,13 @@ function buildNewsQueries(explicitQueries, profileName) {
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+
+function emitProgress(onProgress, payload) {
+  if (typeof onProgress === "function") {
+    onProgress(payload);
+  }
 }
 
 
@@ -493,7 +525,7 @@ function buildEligibleUniverse(instruments, settings) {
   const excludedReasonCounts = new Map();
 
   for (const instrument of safeArray(instruments)) {
-    const symbol = normalizeSymbol(instrument?.ticker);
+    const symbol = resolveBrokerSymbol(instrument);
     if (!symbol) {
       excludedReasonCounts.set("invalid_symbol", (excludedReasonCounts.get("invalid_symbol") || 0) + 1);
       continue;
@@ -556,7 +588,7 @@ function buildInstrumentIndex(instruments) {
   const index = new Map();
 
   for (const instrument of safeArray(instruments)) {
-    const symbol = normalizeSymbol(instrument?.ticker);
+    const symbol = resolveBrokerSymbol(instrument);
     if (!symbol || !isLikelyCommonEquity(instrument)) {
       continue;
     }
@@ -790,12 +822,13 @@ function screeningCandidateScore({ rawCandidate, priceAction, settings }) {
 }
 
 
-async function runLightweightScreening(rawCandidates, settings, availability, { limit, fetchMarketData } = {}) {
+async function runLightweightScreening(rawCandidates, settings, availability, { limit, fetchMarketData, onProgress, progressStage } = {}) {
   const screenedCandidates = [];
   const candidateLimit = Math.max(0, limit ?? settings.screeningLimit ?? safeArray(rawCandidates).length);
   const shouldFetchMarketData = fetchMarketData ?? settings.enableLightweightScreening;
 
-  for (const rawCandidate of safeArray(rawCandidates).slice(0, candidateLimit)) {
+  const candidates = safeArray(rawCandidates).slice(0, candidateLimit);
+  for (const [index, rawCandidate] of candidates.entries()) {
     const screeningSnapshot = shouldFetchMarketData
       ? await buildLightweightScreeningSnapshot({ symbol: rawCandidate.symbol, settings, availability })
       : null;
@@ -816,6 +849,15 @@ async function runLightweightScreening(rawCandidates, settings, availability, { 
         ageDays: rawCandidate.instrument?.ageDays ?? null,
       },
     });
+
+    if ((index + 1 === candidates.length || (index + 1) % 5 === 0 || index === 0) && progressStage) {
+      emitProgress(onProgress, {
+        stage: progressStage,
+        detail: `${rawCandidate.symbol} (${index + 1}/${candidates.length})`,
+        completed: index + 1,
+        total: candidates.length,
+      });
+    }
   }
 
   screenedCandidates.sort((left, right) => right.screeningScore - left.screeningScore);
@@ -840,11 +882,19 @@ function createUniverseScreenCandidate(eligibleInstrument) {
 }
 
 
-async function runUniverseScreening(eligibleInstruments, settings, availability) {
+async function runUniverseScreening(eligibleInstruments, settings, availability, onProgress) {
   const universeCandidates = safeArray(eligibleInstruments).map(createUniverseScreenCandidate);
+  emitProgress(onProgress, {
+    stage: "universe_screen_metadata",
+    detail: `Ranking ${universeCandidates.length} eligible names using broker metadata`,
+    completed: 0,
+    total: universeCandidates.length,
+  });
   const metadataRankedCandidates = await runLightweightScreening(universeCandidates, settings, availability, {
     limit: universeCandidates.length,
     fetchMarketData: false,
+    onProgress,
+    progressStage: "universe_screen_metadata",
   });
 
   const priceScreenCandidates = settings.enableUniverseScreening
@@ -855,6 +905,8 @@ async function runUniverseScreening(eligibleInstruments, settings, availability)
         {
           limit: Math.min(metadataRankedCandidates.length, settings.universePriceScreenLimit),
           fetchMarketData: true,
+          onProgress,
+          progressStage: "universe_screen_prices",
         }
       )
     : metadataRankedCandidates.slice(0, settings.universeShortlistLimit);
@@ -1036,6 +1088,7 @@ async function runRulesEngineSelection({
   newsLimit,
   insiderRows,
   queryTerms,
+  onProgress,
 } = {}) {
   const settings = buildRulesEngineSettings({
     maxCandidates,
@@ -1047,10 +1100,18 @@ async function runRulesEngineSelection({
   });
 
   const availability = providerStatus();
+  emitProgress(onProgress, {
+    stage: "load_universe",
+    detail: "Loading Trading 212 instrument universe",
+  });
   const instrumentUniverse = await loadTrading212InstrumentUniverse();
   const allInstruments = instrumentUniverse.instruments;
   const { eligibleInstruments, eligibleIndex, summary: eligibleUniverseSummary } = buildEligibleUniverse(allInstruments, settings);
-  const universeScreening = await runUniverseScreening(eligibleInstruments, settings, availability);
+  emitProgress(onProgress, {
+    stage: "eligible_universe",
+    detail: `Eligible universe: ${eligibleUniverseSummary.eligibleInstrumentCount} of ${allInstruments.length}`,
+  });
+  const universeScreening = await runUniverseScreening(eligibleInstruments, settings, availability, onProgress);
   const screenedUniverseIndex = new Map(
     universeScreening.shortlistedSymbols
       .map((symbol) => [symbol, eligibleIndex.get(symbol)])
@@ -1087,6 +1148,10 @@ async function runRulesEngineSelection({
   }
 
   if (availability.finnhub && settings.enableMarketNews) {
+    emitProgress(onProgress, {
+      stage: "discovery_market_news",
+      detail: "Scanning Finnhub market news",
+    });
     const client = new FinnhubClient();
     const marketNews = await safeCall(() => client.getMarketNews({ category: "general", limit: settings.newsLimit * settings.marketNewsLimitMultiplier }));
     for (const article of safeArray(marketNews)) {
@@ -1108,7 +1173,13 @@ async function runRulesEngineSelection({
 
   if (availability.newsdata && settings.enableNewsData) {
     const client = new NewsDataClient();
-    for (const query of settings.queryTerms) {
+    for (const [index, query] of settings.queryTerms.entries()) {
+      emitProgress(onProgress, {
+        stage: "discovery_newsdata",
+        detail: `Running NewsData query ${index + 1}/${settings.queryTerms.length}: ${query}`,
+        completed: index,
+        total: settings.queryTerms.length,
+      });
       const newsResponse = await safeCall(() => client.getLatestNews({ query, category: "business", language: "en" }));
       const articles = safeArray(newsResponse?.results);
       for (const article of articles) {
@@ -1128,9 +1199,19 @@ async function runRulesEngineSelection({
         }
       }
     }
+    emitProgress(onProgress, {
+      stage: "discovery_newsdata",
+      detail: `Completed ${settings.queryTerms.length} NewsData queries`,
+      completed: settings.queryTerms.length,
+      total: settings.queryTerms.length,
+    });
   }
 
   if (settings.enableOpenInsider) {
+    emitProgress(onProgress, {
+      stage: "discovery_openinsider",
+      detail: `Scanning latest insider filings (${settings.insiderRows} rows)`,
+    });
     const insiderClient = new OpenInsiderClient();
     const insiderResponse = await safeCall(() => insiderClient.getLatestInsiderTrades({ rows: settings.insiderRows }));
     for (const row of safeArray(insiderResponse?.rows)) {
@@ -1156,11 +1237,26 @@ async function runRulesEngineSelection({
     return right.mentionCount - left.mentionCount;
   });
 
-  const screenedCandidates = await runLightweightScreening(rawCandidates, settings, availability);
+  emitProgress(onProgress, {
+    stage: "candidate_screening",
+    detail: `Screening ${Math.min(rawCandidates.length, settings.screeningLimit)} discovery candidates`,
+    completed: 0,
+    total: Math.min(rawCandidates.length, settings.screeningLimit),
+  });
+  const screenedCandidates = await runLightweightScreening(rawCandidates, settings, availability, {
+    onProgress,
+    progressStage: "candidate_screening",
+  });
   const preEnrichmentCandidates = screenedCandidates.slice(0, settings.rawCandidateLimit);
 
   const enrichedCandidates = [];
-  for (const rawCandidate of preEnrichmentCandidates) {
+  emitProgress(onProgress, {
+    stage: "candidate_enrichment",
+    detail: `Building deep snapshots for ${preEnrichmentCandidates.length} shortlisted names`,
+    completed: 0,
+    total: preEnrichmentCandidates.length,
+  });
+  for (const [index, rawCandidate] of preEnrichmentCandidates.entries()) {
     const snapshot = await safeCall(() => getEquityDataSnapshot({
       symbol: rawCandidate.symbol,
       companyName: rawCandidate.instrument?.name || rawCandidate.companyName || undefined,
@@ -1194,6 +1290,13 @@ async function runRulesEngineSelection({
       newsSignal,
       insiderSignal,
       score,
+    });
+
+    emitProgress(onProgress, {
+      stage: "candidate_enrichment",
+      detail: `${rawCandidate.symbol} (${index + 1}/${preEnrichmentCandidates.length})`,
+      completed: index + 1,
+      total: preEnrichmentCandidates.length,
     });
   }
 

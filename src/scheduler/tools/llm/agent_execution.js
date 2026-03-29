@@ -223,7 +223,7 @@ function getAgentExecutionState(overrides = {}) {
 }
 
 
-async function executeAgentPipeline({ config, cycleRoot, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview, rulesEngineOutput, llmOptions } = {}) {
+async function executeAgentPipeline({ config, cycleRoot, portfolioContext, tickerContexts, marketDataSnapshot, rebalancePreview, rulesEngineOutput, llmOptions, onProgress } = {}) {
   const llmClient = new OpenAICompatibleLlmClient(llmOptions);
   if (!llmClient.isConfigured()) {
     return getAgentExecutionState(llmOptions);
@@ -239,8 +239,16 @@ async function executeAgentPipeline({ config, cycleRoot, portfolioContext, ticke
   });
   const priorReports = {};
 
-  for (const key of REPORT_ORDER) {
+  for (const [index, key] of REPORT_ORDER.entries()) {
     const report = getReportDefinition(key);
+    if (typeof onProgress === "function") {
+      onProgress({
+        stage: "agent_report",
+        detail: `Generating ${report.title}`,
+        completed: index,
+        total: REPORT_ORDER.length,
+      });
+    }
     const systemPrompt = await readPrompt(report);
     const userPrompt = buildUserPrompt({ key, sharedContext, priorReports });
     const content = await llmClient.generateMarkdownReport({
@@ -250,6 +258,14 @@ async function executeAgentPipeline({ config, cycleRoot, portfolioContext, ticke
 
     await writeReport(cycleRoot, report, content);
     priorReports[key] = content;
+    if (typeof onProgress === "function") {
+      onProgress({
+        stage: "agent_report",
+        detail: `Generated ${report.title}`,
+        completed: index + 1,
+        total: REPORT_ORDER.length,
+      });
+    }
   }
 
   return {

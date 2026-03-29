@@ -1,0 +1,46 @@
+{
+  "environment": "demo",
+  "summary": {
+    "id": 10021669,
+    "currency": "GBP",
+    "totalValue": 10000,
+    "cash": {
+      "availableToTrade": 10000,
+      "reservedForOrders": 0,
+      "inPies": 0
+    },
+    "investments": {
+      "currentValue": 0,
+      "totalCost": 0,
+      "realizedProfitLoss": 0,
+      "unrealizedProfitLoss": 0
+    }
+  },
+  "cash": {
+    "availableToTrade": 10000,
+    "inPies": 0,
+    "reservedForOrders": 0,
+    "total": 10000,
+    "invested": 0,
+    "result": 0,
+    "profitLoss": 0,
+    "raw": {
+      "free": 10000,
+      "total": 10000,
+      "ppl": 0,
+      "result": 0,
+      "invested": 0,
+      "pieCash": 0,
+      "blocked": 0
+    }
+  },
+  "positions": [],
+  "pendingOrders": [],
+  "rateLimit": {
+    "limit": "1",
+    "period": "5",
+    "remaining": "0",
+    "reset": "1774759492",
+    "used": "1"
+  }
+}
