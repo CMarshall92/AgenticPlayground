@@ -14,22 +14,6 @@ services:
       timeout: 5s
       retries: 20
 
-  dashboard:
-    build: .
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      DATABASE_URL: postgresql://agnetic:agnetic@postgres:5432/agneticanalysis
-      DASHBOARD_HOST: 0.0.0.0
-      DASHBOARD_PORT: 3000
-    ports:
-      - "3000:3000"
-    command: sh -c "npm run db:wait && npm run db:init && npm run dashboard"
-
   scheduler:
     build: .
     restart: unless-stopped

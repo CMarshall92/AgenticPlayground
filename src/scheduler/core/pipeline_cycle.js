@@ -5,12 +5,12 @@ const {
   buildBrokerRebalancePreview,
   getPortfolioBrokerContext,
   getTickerBrokerContext,
-} = require("./trading212/trading212_agent_tools");
+} = require("../tools/trading212/trading212_agent_tools");
 const {
   getEquityDataSnapshot,
   getMacroDataSnapshot,
   providerStatus,
-} = require("./market_data/market_data_agent_tools");
+} = require("../tools/market_data/market_data_agent_tools");
 
 
 const WORKSPACE_ROOT = path.resolve(__dirname, "..");

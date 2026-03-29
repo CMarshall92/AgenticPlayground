@@ -1,6 +1,6 @@
 ## Daily Pipeline Runner
 
-This repo now includes a Postgres-backed daily pipeline runner, an automatic LLM report-generation layer, a dashboard/API server, and a UTC scheduler.
+This repo now includes a Postgres-backed daily pipeline runner, an automatic LLM report-generation layer, and a UTC scheduler.
 
 The daily runner does these steps:
 
@@ -9,7 +9,7 @@ The daily runner does these steps:
 3. Captures market-data snapshots for configured equities and FRED series.
 4. Optionally builds a rebalance preview when target weights are configured.
 5. Automatically generates the five agent reports when an OpenAI-compatible LLM is configured.
-6. Persists collected artifacts, report files, authored agent outputs, and a final dashboard summary into Postgres.
+6. Persists collected artifacts, report files, authored agent outputs, and a final pipeline summary into Postgres.
 
 Current limitation:
 
@@ -60,11 +60,6 @@ Daily runner configuration:
 - `PIPELINE_CYCLE_NAME` optional explicit cycle name override
 - `PIPELINE_NEWS_LIMIT` optional per-provider news item limit
 
-Dashboard server:
-
-- `DASHBOARD_HOST` default `0.0.0.0`
-- `DASHBOARD_PORT` default `3000`
-
 Scheduler configuration:
 
 - `PIPELINE_RUN_HOUR_UTC` default `6`
@@ -90,12 +85,6 @@ Run one daily collection cycle immediately:
 npm run pipeline:run-daily
 ```
 
-Run the dashboard/API server locally:
-
-```bash
-npm run dashboard
-```
-
 Start the long-running UTC scheduler:
 
 ```bash
@@ -116,7 +105,7 @@ npm run check
 
 ## Stored Postgres Data
 
-The runner persists dashboard-oriented data into these tables:
+The runner persists pipeline state into these tables:
 
 - `pipeline_runs`
 - `pipeline_artifacts`
@@ -124,22 +113,7 @@ The runner persists dashboard-oriented data into these tables:
 - `pipeline_final_reports`
 - `provider_usage_windows`
 
-This structure is meant to support a future dashboard that needs both raw JSON artifacts and markdown-oriented report content.
-
-## Dashboard API
-
-The built-in server exposes these endpoints:
-
-- `GET /api/health`
-- `GET /api/overview`
-- `GET /api/runs?limit=20`
-- `GET /api/runs/latest`
-- `GET /api/runs/:id`
-- `GET /api/runs/:id/artifacts`
-- `GET /api/runs/:id/agent-outputs`
-- `GET /api/runs/:id/final-reports`
-
-The server also serves a browser dashboard at `/`.
+This structure retains both raw JSON artifacts and markdown-oriented report content for auditability, downstream automation, and future integrations.
 
 ## LLM Execution Layer
 
@@ -159,7 +133,7 @@ When `LLM_ENABLED=true` and the model credentials are configured, the runner wil
 
 ## Docker
 
-Yes. The third step can be dockerized so it runs on any system with Docker.
+The scheduler flow can be containerized so it runs on any system with Docker.
 
 This repo now includes:
 
@@ -167,11 +141,10 @@ This repo now includes:
 - `docker-compose.yml`
 - `.dockerignore`
 
-The compose setup starts three services:
+The compose setup starts two services:
 
 1. `postgres` for a self-contained local database
-2. `dashboard` for the API and browser UI on port `3000`
-3. `scheduler` for the long-running daily runner
+2. `scheduler` for the long-running daily runner
 
 To start everything:
 
@@ -179,5 +152,10 @@ To start everything:
 docker compose up --build
 ```
 
+The container image now defaults to `npm run pipeline:schedule`.
+
+If you want to execute a single cycle instead of the long-running scheduler, override the container command with `npm run pipeline:run-daily`.
+
 If you prefer Neon or another hosted Postgres instance, replace the `DATABASE_URL` in `docker-compose.yml` or remove the local `postgres` service and point both containers at the external database.
+
 # AgententicPlaground

@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { closePool } = require("./db/postgres");
+const { closePool } = require("../../db/postgres");
 const { buildDefaultCycleName, runDailyPipeline } = require("./daily_pipeline_runner");
 
 

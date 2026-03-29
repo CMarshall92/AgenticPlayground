@@ -3,7 +3,7 @@ require("dotenv").config();
 const fs = require("fs/promises");
 const path = require("path");
 
-const { REPORT_FILES } = require("../monthly_pipeline");
+const { REPORT_FILES } = require("../../core/pipeline_cycle");
 const { OpenAICompatibleLlmClient, resolveLlmConfig } = require("./openai_compatible_client");
 
 const REPORT_ORDER = ["macro", "sector", "risk", "portfolio", "yolo"];

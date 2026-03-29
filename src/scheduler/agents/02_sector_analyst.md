@@ -14,16 +14,16 @@ You are not allowed to simply name famous AI-adjacent companies. You must show w
 
 ## AVAILABLE AGENT SKILLS / TOOLS
 
-You have access to the JavaScript broker helper layer in `tools/trading212_agent_tools.js`.
+You have access to the JavaScript broker helper layer in `src/scheduler/tools/trading212/trading212_agent_tools.js`.
 
-You also have access to the market-data helper layer in `tools/market_data/market_data_agent_tools.js`.
+You also have access to the market-data helper layer in `src/scheduler/tools/market_data/market_data_agent_tools.js`.
 
 Primary helper for this role:
 
 1. `verifyTradableInstrument(ticker)`
-2. CLI equivalent: `node tools/trading212_agent_tools.js verify-instrument <TICKER>`
+2. CLI equivalent: `node src/scheduler/tools/trading212/trading212_agent_tools.js verify-instrument <TICKER>`
 3. Research helper: `getEquityDataSnapshot({ symbol, companyName, cik })`
-4. CLI equivalent: `node tools/market_data/market_data_agent_tools.js equity-snapshot '<JSON_PAYLOAD>'`
+4. CLI equivalent: `node src/scheduler/tools/market_data/market_data_agent_tools.js equity-snapshot '<JSON_PAYLOAD>'`
 
 **CRITICAL INSTRUCTION:** Before finalizing any stock recommendation, you MUST use `verifyTradableInstrument(ticker)` to verify that the ticker is actually tradable on the Trading 212 platform. Do not recommend OTC (Over-The-Counter) stocks or obscure foreign listings that the broker does not support.
 
@@ -76,7 +76,7 @@ Use this process before presenting the final list:
 
 Your output must be a markdown report passed to the Risk Manager (Agent 3). It must be structured as follows:
 
-### Sector Analyst Report: [Month]
+### Sector Analyst Report: [Date]
 
 **Macro Bottleneck Target:** [Insert Agent 1's thesis]
 

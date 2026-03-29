@@ -3,14 +3,14 @@ require("dotenv").config();
 const fs = require("fs/promises");
 const path = require("path");
 
-const { closePool } = require("./db/postgres");
+const { closePool } = require("../../db/postgres");
 const {
   createPipelineRun,
   updatePipelineRun,
   upsertAgentOutput,
   upsertFinalReport,
   upsertPipelineArtifact,
-} = require("./db/pipeline_store");
+} = require("../../db/pipeline_store");
 const {
   OUTPUT_ROOT,
   REPORT_FILES,
@@ -20,8 +20,8 @@ const {
   captureTickerContexts,
   getCycleRoot,
   initCycle,
-} = require("./monthly_pipeline");
-const { executeAgentPipeline, getAgentExecutionState } = require("./llm/agent_execution");
+} = require("./pipeline_cycle");
+const { executeAgentPipeline, getAgentExecutionState } = require("../tools/llm/agent_execution");
 
 
 function parseJsonEnv(name, fallbackValue) {
@@ -147,7 +147,7 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
       ? `- Actions generated: ${Array.isArray(rebalancePreview.actions) ? rebalancePreview.actions.length : 0}\n- Estimated account value: ${rebalancePreview.totalValue ?? "Unavailable"}`
       : "- Rebalance preview skipped because PIPELINE_TARGET_WEIGHTS is not configured."}\n\n`
     + `## Current Limitation\n\n`
-    + `- This runner persists collected data, report files, and a dashboard-ready summary to Postgres.\n`
+    + `- This runner persists collected data, report files, and a final pipeline summary to Postgres.\n`
     + `${llmState.generated
       ? "- Symbol discovery is still limited to the configured pipeline symbol universe and the captured data bundle for the current run.\n"
       : "- If no compatible LLM is configured, the data pipeline still runs but the report files stay in template/manual mode.\n"}`;

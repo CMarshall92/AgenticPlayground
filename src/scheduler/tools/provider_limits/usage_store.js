@@ -1,4 +1,4 @@
-const { withClient } = require("../db/postgres");
+const { withClient } = require("../../../db/postgres");
 
 const PERIOD_TYPES = new Set(["hour", "day"]);
 

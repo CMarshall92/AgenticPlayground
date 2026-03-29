@@ -9,6 +9,4 @@ COPY src ./src
 COPY README.md ./README.md
 COPY .env.preview ./.env.preview
 
-EXPOSE 3000
-
-CMD ["npm", "run", "dashboard"]
+CMD ["npm", "run", "pipeline:schedule"]
