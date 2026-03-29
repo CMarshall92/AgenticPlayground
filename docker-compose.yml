@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agnetic
+      POSTGRES_PASSWORD: agnetic
+      POSTGRES_DB: agneticanalysis
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agnetic -d agneticanalysis"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  dashboard:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://agnetic:agnetic@postgres:5432/agneticanalysis
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: 3000
+    ports:
+      - "3000:3000"
+    command: sh -c "npm run db:wait && npm run db:init && npm run dashboard"
+
+  scheduler:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://agnetic:agnetic@postgres:5432/agneticanalysis
+    command: sh -c "npm run db:wait && npm run db:init && npm run pipeline:schedule"
+
+volumes:
+  postgres_data:

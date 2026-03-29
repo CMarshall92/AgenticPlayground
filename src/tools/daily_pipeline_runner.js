@@ -21,6 +21,7 @@ const {
   getCycleRoot,
   initCycle,
 } = require("./monthly_pipeline");
+const { executeAgentPipeline, getAgentExecutionState } = require("./llm/agent_execution");
 
 
 function parseJsonEnv(name, fallbackValue) {
@@ -104,12 +105,13 @@ function isTemplateReport(content) {
 }
 
 
-function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot, rebalancePreview, reportSnapshots, cycleRoot }) {
+function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot, rebalancePreview, reportSnapshots, cycleRoot, agentExecution }) {
   const completedReports = reportSnapshots.filter((report) => !report.isTemplate);
   const pendingReports = reportSnapshots.filter((report) => report.isTemplate);
   const providerAvailability = marketDataSnapshot?.providerAvailability || {};
   const positionsCount = Array.isArray(portfolioContext?.positions) ? portfolioContext.positions.length : 0;
   const pendingOrdersCount = Array.isArray(portfolioContext?.pendingOrders) ? portfolioContext.pendingOrders.length : 0;
+  const llmState = agentExecution || getAgentExecutionState();
 
   const targetWeightLines = config.targetWeights
     ? Object.entries(config.targetWeights).map(([ticker, weight]) => `- ${ticker}: ${weight}%`)
@@ -134,13 +136,21 @@ function buildFinalSummary({ runId, config, portfolioContext, marketDataSnapshot
     + `- Completed agent reports: ${completedReports.length}\n`
     + `- Pending/template agent reports: ${pendingReports.length}\n`
     + `${reportSnapshots.map((report) => `- ${report.key}: ${report.isTemplate ? "template only" : "contains authored content"} (${report.reportPath})`).join("\n")}\n\n`
+    + `## LLM Execution\n\n`
+    + `- Enabled: ${llmState.enabled ? "yes" : "no"}\n`
+    + `- Generated reports automatically: ${llmState.generated ? "yes" : "no"}\n`
+    + `- Model: ${llmState.model || "Not configured"}\n`
+    + `- Base URL: ${llmState.baseUrl || "Not configured"}\n`
+    + `- Status note: ${llmState.reason || (llmState.generated ? "Agent reports were generated from the configured LLM." : "Agent reports remained file-based for this run.")}\n\n`
     + `## Rebalance Preview\n\n`
     + `${rebalancePreview
       ? `- Actions generated: ${Array.isArray(rebalancePreview.actions) ? rebalancePreview.actions.length : 0}\n- Estimated account value: ${rebalancePreview.totalValue ?? "Unavailable"}`
       : "- Rebalance preview skipped because PIPELINE_TARGET_WEIGHTS is not configured."}\n\n`
     + `## Current Limitation\n\n`
     + `- This runner persists collected data, report files, and a dashboard-ready summary to Postgres.\n`
-    + `- It does not yet execute the agent markdown prompts through a model automatically. Final agent narratives remain file-based until an LLM execution layer is added.\n`;
+    + `${llmState.generated
+      ? "- Symbol discovery is still limited to the configured pipeline symbol universe and the captured data bundle for the current run.\n"
+      : "- If no compatible LLM is configured, the data pipeline still runs but the report files stay in template/manual mode.\n"}`;
 }
 
 
@@ -188,6 +198,7 @@ async function persistReportFiles(runId, cycleRoot) {
 async function runDailyPipeline(overrides = {}) {
   const config = buildRunConfig(overrides);
   await initCycle(config.cycleName);
+  const agentExecutionState = getAgentExecutionState(overrides.llm);
 
   const run = await createPipelineRun({
     cycleName: config.cycleName,
@@ -256,6 +267,16 @@ async function runDailyPipeline(overrides = {}) {
       });
     }
 
+    const agentExecution = await executeAgentPipeline({
+      config,
+      cycleRoot,
+      portfolioContext,
+      tickerContexts,
+      marketDataSnapshot,
+      rebalancePreview,
+      llmOptions: overrides.llm,
+    });
+
     const reportSnapshots = await persistReportFiles(run.id, cycleRoot);
     const finalSummary = buildFinalSummary({
       runId: run.id,
@@ -265,6 +286,7 @@ async function runDailyPipeline(overrides = {}) {
       rebalancePreview,
       reportSnapshots,
       cycleRoot,
+      agentExecution,
     });
 
     const finalReportPath = path.join(cycleRoot, "06_daily_summary_report.md");
@@ -276,7 +298,8 @@ async function runDailyPipeline(overrides = {}) {
       contentMarkdown: finalSummary,
       metadata: {
         reportPath: finalReportPath,
-        manualAgentExecutionRequired: true,
+        manualAgentExecutionRequired: !agentExecution.generated,
+        llmExecution: agentExecution,
       },
     });
 
@@ -287,7 +310,8 @@ async function runDailyPipeline(overrides = {}) {
       filePath: finalReportPath,
       contentMarkdown: finalSummary,
       metadata: {
-        manualAgentExecutionRequired: true,
+        manualAgentExecutionRequired: !agentExecution.generated,
+        llmExecution: agentExecution,
       },
     });
 
@@ -298,6 +322,7 @@ async function runDailyPipeline(overrides = {}) {
         symbolsProcessed: config.symbols.length,
         reportFilesPersisted: reportSnapshots.length,
         finalReportPath,
+        llmExecution: agentExecution,
       },
     });
 
@@ -307,6 +332,7 @@ async function runDailyPipeline(overrides = {}) {
       cycleName: config.cycleName,
       status: completedRun.status,
       finalReportPath,
+      llmExecution: agentExecution,
     };
   } catch (error) {
     await updatePipelineRun(run.id, {
@@ -341,5 +367,6 @@ if (require.main === module) {
 module.exports = {
   buildDefaultCycleName,
   buildRunConfig,
+  getAgentExecutionState,
   runDailyPipeline,
 };
